@@ -7,7 +7,7 @@ function App() {
       <ul>
         {mockTasks.map((task) => (
           <li key={task.id}>
-            {task.title} — {task.status} ({task.priority}), до {task.dueDate}
+            {task.title} — {task.status} ({task.priority}), due {task.dueDate}
           </li>
         ))}
       </ul>

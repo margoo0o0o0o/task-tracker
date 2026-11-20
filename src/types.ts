@@ -14,6 +14,7 @@ export interface Task {
   description: string;
   status: TaskStatus;
   priority: Priority;
-  dueDate: string; 
+  /** Срок в формате YYYY-MM-DD */
+  dueDate: string;
   subtasks: Subtask[];
 }
