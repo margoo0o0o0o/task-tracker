@@ -1,16 +1,21 @@
-import { mockTasks } from './data/mockTasks';
+import { Board } from './components/Board';
+import { ProgressBar } from './components/ProgressBar';
+import { ProjectHeader } from './components/ProjectHeader';
+import { useTasks } from './hooks/useTasks';
+import { getProgressPercent } from './utils/progress';
 
 function App() {
+  const [tasks] = useTasks();
+  const percent = getProgressPercent(tasks);
+
   return (
-    <main>
-      <h1>TaskFlow</h1>
-      <ul>
-        {mockTasks.map((task) => (
-          <li key={task.id}>
-            {task.title} — {task.status} ({task.priority}), due {task.dueDate}
-          </li>
-        ))}
-      </ul>
+    <main className="page">
+      <ProjectHeader
+        title="Website Redesign"
+        description="Redesign company website with new branding"
+      />
+      <ProgressBar percent={percent} />
+      <Board tasks={tasks} />
     </main>
   );
 }
