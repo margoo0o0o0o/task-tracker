@@ -5,21 +5,34 @@ import { taskReducer } from '../state/taskReducer';
 import type { TaskAction } from '../state/taskReducer';
 import type { Task } from '../types';
 import { isTaskArray } from '../utils/guards';
-import { useLocalStorage } from './useLocalStorage';
 
 const STORAGE_KEY = 'task-tracker:tasks';
 
-export function useTasks(): [Task[], Dispatch<TaskAction>] {
-  const [storedTasks, setStoredTasks] = useLocalStorage<Task[]>(
-    STORAGE_KEY,
-    mockTasks,
-    isTaskArray,
-  );
-  const [tasks, dispatch] = useReducer(taskReducer, storedTasks);
+// читаем из localStorage 1 раз при старте
+function initTasks(): Task[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return mockTasks;
+    
+    const parsed: unknown = JSON.parse(raw);
+    return isTaskArray(parsed) ? parsed : mockTasks;
+  } catch {
+    return mockTasks;
+  }
+}
 
+export function useTasks(): [Task[], Dispatch<TaskAction>] {
+  // useReducer берет начальное значение из initTasks()
+  const [tasks, dispatch] = useReducer(taskReducer, undefined, initTasks);
+
+  // сохраняем в localStorage при каждом изменении
   useEffect(() => {
-    setStoredTasks(tasks);
-  }, [tasks, setStoredTasks]);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    } catch {
+      // если хранилище недоступно, просто игнорируем
+    }
+  }, [tasks]);
 
   return [tasks, dispatch];
 }
